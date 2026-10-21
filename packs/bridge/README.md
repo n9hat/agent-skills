@@ -139,7 +139,7 @@ git clone https://github.com/n9hat/agent-skills.git ~/agent-skills
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash and jq
 # or
-node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later; meant for Windows too (not yet tested there)
+node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later
 ```
 
 Add `--no-hook` to skip the Claude Code hook in `.claude/settings.json`.
@@ -295,14 +295,12 @@ Not yet run:
 - **macOS:** `install.sh`, `install.js`, and `promote.sh`.
 - **Windows outside WSL:** `install.js` in PowerShell or cmd, `promote.sh` in Git Bash, and the Claude Code startup hook through Git Bash.
 
-If you try any of these, please open an issue saying what worked and what did not.
-
 ## Known limitations
 
 - The bridge is installed per project, not per user. That is deliberate: the skills travel with the clone, so whoever takes over has them without installing anything. Open the project folder itself, not a parent folder.
 - **Coming soon, in part:** a personal install (`--user`) that makes the commands available in every project you open, without installing the bridge into each one. Handovers will still be per repository, as described in [Where a handover works](#where-a-handover-works).
 - The startup reminder is a native hook only in Claude Code. The other tools rely on the `AGENTS.md` note, which they read as instructions rather than as an automatic trigger.
-- The hook command uses POSIX shell syntax. On Windows, Claude Code needs Git Bash available to run it (not yet tested).
+- The hook command uses POSIX shell syntax. On Windows, Claude Code needs Git Bash available to run it.
 - Each tool decides for itself when a skill matches what you typed. If a phrase does not pick the skill, use the explicit command.
 
 ## Pack layout

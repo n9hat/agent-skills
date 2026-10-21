@@ -22,7 +22,7 @@ git clone https://github.com/n9hat/agent-skills.git ~/agent-skills
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash (and jq for some packs)
 # or
-node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later; meant for Windows too (not yet tested there)
+node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later
 ```
 
 | Option | Effect |
@@ -85,7 +85,7 @@ A pack can also carry its own `LICENSE` if its terms differ from this repository
 - **Run hands-on:** Claude Code on Linux and WSL Ubuntu, and the automated tests below on Linux.
 - **Not yet run:** Codex, Copilot, Gemini CLI, and other tools; macOS; Windows outside WSL.
 
-Each pack's README lists exactly what was run, for example the [bridge](packs/bridge/README.md#tested-so-far). Reports from other tools and platforms are welcome as issues.
+Each pack's README lists exactly what was run, for example the [bridge](packs/bridge/README.md#tested-so-far).
 
 ## Testing
 

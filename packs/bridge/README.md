@@ -205,10 +205,13 @@ A merge request (MR) or pull request always shows everything that differs betwee
 git fetch origin
 git switch -c feature/<topic> origin/main
 git diff --binary origin/main...bridge/<topic> -- . ':(exclude).bridge' | git apply --index
+git status --short                     # must list the staged changes; if empty, the apply did nothing
 bash tests/run.sh                      # or your project's checks
 git commit -m "<what the work does>"
 git push -u origin feature/<topic>     # open the MR from this branch
 ```
+
+Check `git status --short` before running the checks: on an unchanged branch they would test the old main and pass for the wrong reason.
 
 The three dots mean "what the bridge branch changed since it left main", so work merged into main in the meantime is not undone. The bridge branch's commit-by-commit history never reaches main; only the clean result does.
 

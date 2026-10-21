@@ -330,7 +330,7 @@ The suite installs the pack through both hub installers into fresh, existing, an
 
 ## Works alongside
 
-The bridge is meant to sit next to whatever workflow a team already uses, for example [pstack](https://github.com/cursor/plugins/tree/main/pstack/skills), the [Agentic Coding Flywheel](https://github.com/Dicklesworthstone/agentic_coding_flywheel_setup), [Spec Kit](https://github.com/github/spec-kit), [Matt Pocock's skills](https://github.com/mattpocock/skills), or none at all. It does not replace any of them.
+The bridge is meant to sit next to whatever workflow a team already uses, for example [pstack](https://github.com/cursor/plugins/tree/main/pstack/skills), the [Agentic Coding Flywheel](https://github.com/Dicklesworthstone/agentic_coding_flywheel_setup), [Spec Kit](https://github.com/github/spec-kit), [mattpocock/skills](https://github.com/mattpocock/skills), or none at all. It does not replace any of them, and this project is not affiliated with any of them.
 
 ## License
 

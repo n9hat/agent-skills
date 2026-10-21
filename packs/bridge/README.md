@@ -15,7 +15,7 @@ That works until the work has to change hands. Then the next person faces questi
 - What is finished, what is broken, and what was decided along the way?
 - What is the next step, expressed in *my* way of working?
 
-The bridge answers them with one plain-language file, committed to the branch, and two commands that the major AI coding tools can run. **Nobody has to change how they work.**
+The bridge answers them with one plain-language file, committed to the branch, and two commands in the open `SKILL.md` format that AI coding tools read. **Nobody has to change how they work.**
 
 ## How it works
 
@@ -105,13 +105,15 @@ The names carry a `bridge-` prefix on purpose: they do not collide with other po
 
 The skills follow the open `SKILL.md` format. The installer places them where each tool looks for them, and adds a startup reminder so the next session notices a waiting handover.
 
-| Tool | Reads the skills from | Run it with | Startup reminder |
-|---|---|---|---|
-| Claude Code | `.claude/skills/` | `/bridge-handoff`, `/bridge-takeover`, or the words | `SessionStart` hook in `.claude/settings.json` |
-| OpenAI Codex | `.agents/skills/` | `$bridge-handoff`, `$bridge-takeover`, or the words | `AGENTS.md` note |
-| GitHub Copilot | `.agents/skills/` or `.claude/skills/` | ask for "bridge handoff" / "bridge takeover" | `AGENTS.md` note |
-| Gemini CLI | `.agents/skills/` | ask for it by name; Gemini asks before activating a skill | `AGENTS.md` note (see below) |
-| Grok Build | `.grok/skills/` | ask for it by name | `AGENTS.md` note; copy the skills manually (see below) |
+**Only Claude Code has been tested so far.** The other rows come from each tool's documentation, not from a hands-on run; see [Tested so far](#tested-so-far).
+
+| Tool | Tested | Reads the skills from | Run it with | Startup reminder |
+|---|---|---|---|---|
+| Claude Code | yes | `.claude/skills/` | `/bridge-handoff`, `/bridge-takeover`, or the words | `SessionStart` hook in `.claude/settings.json` |
+| OpenAI Codex | not yet | `.agents/skills/` | `$bridge-handoff`, `$bridge-takeover`, or the words | `AGENTS.md` note |
+| GitHub Copilot | not yet | `.agents/skills/` or `.claude/skills/` | ask for "bridge handoff" / "bridge takeover" | `AGENTS.md` note |
+| Gemini CLI | not yet | `.agents/skills/` | ask for it by name; Gemini asks before activating a skill | `AGENTS.md` note (see below) |
+| Grok Build | not yet | `.grok/skills/` | ask for it by name | `AGENTS.md` note; copy the skills manually (see below) |
 
 Any tool can also be told in words: "run a bridge takeover". Skills are matched on their description.
 
@@ -137,7 +139,7 @@ git clone https://github.com/n9hat/agent-skills.git ~/agent-skills
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash and jq
 # or
-node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later; works on Windows
+node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later; meant for Windows too (not yet tested there)
 ```
 
 Add `--no-hook` to skip the Claude Code hook in `.claude/settings.json`.
@@ -280,12 +282,27 @@ Both skills enforce the same three rules, whichever workflow produced the code:
 
 Neither skill commits, pushes, or changes code on its own; the person stays in control.
 
+## Tested so far
+
+Run hands-on:
+
+- **Claude Code on Linux and WSL Ubuntu:** installing the pack, handing a branch back and forth between two laptops with `/bridge-handoff` and `/bridge-takeover`, and promoting the finished work, both by hand and with `promote.sh`.
+- **The automated tests** (`bash tests/run-all.sh`) on Linux: both installers, the bridge extras, and `promote.sh` under `dash` and under `bash` as `sh`.
+
+Not yet run:
+
+- **Other AI tools:** Codex, Copilot, Gemini CLI, and Grok Build. What [Tool support](#tool-support) says about them comes from their documentation.
+- **macOS:** `install.sh`, `install.js`, and `promote.sh`.
+- **Windows outside WSL:** `install.js` in PowerShell or cmd, `promote.sh` in Git Bash, and the Claude Code startup hook through Git Bash.
+
+If you try any of these, please open an issue saying what worked and what did not.
+
 ## Known limitations
 
 - The bridge is installed per project, not per user. That is deliberate: the skills travel with the clone, so whoever takes over has them without installing anything. Open the project folder itself, not a parent folder.
 - **Coming soon, in part:** a personal install (`--user`) that makes the commands available in every project you open, without installing the bridge into each one. Handovers will still be per repository, as described in [Where a handover works](#where-a-handover-works).
 - The startup reminder is a native hook only in Claude Code. The other tools rely on the `AGENTS.md` note, which they read as instructions rather than as an automatic trigger.
-- The hook command uses POSIX shell syntax. On Windows, Claude Code needs Git Bash available to run it.
+- The hook command uses POSIX shell syntax. On Windows, Claude Code needs Git Bash available to run it (not yet tested).
 - Each tool decides for itself when a skill matches what you typed. If a phrase does not pick the skill, use the explicit command.
 
 ## Pack layout

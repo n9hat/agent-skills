@@ -17,8 +17,7 @@ Continue someone else's work, or your own from another machine, without losing m
 4. **Check against the contracts** the handover lists or that you find.
 5. **Report back:** where things stand in a few lines; what no longer matches the repo; the next three steps; questions for the previous owner. Express the plan in the user's own workflow (tasks, beads, a spec change); if you cannot tell which, ask.
 6. **Wait for agreement.** Do not change code until the user agrees with the plan.
-7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it to a clean branch so `.bridge/` never reaches the main branch:
-   `git switch -c <feature> origin/main && git diff --binary origin/main...<bridge-branch> -- . ':(exclude).bridge' | git apply --index`.
+7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it to a clean branch so `.bridge/` never reaches the main branch, with `sh <this skill's folder>/scripts/promote.sh <bridge-branch> --check "<project's checks>"`, run from anywhere in the project. It stages the work and stops; the user commits and pushes.
 
 ## Rules
 

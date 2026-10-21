@@ -199,14 +199,29 @@ Two rules keep the noise out of your main branch: **handover commits touch only 
 
 A merge request (MR) or pull request always shows everything that differs between the two branches, so it cannot leave out a single file. Instead, merge from a branch that never contained the handover, or squash it away.
 
-**A. Promote to a clean branch (recommended).** Copy only the net change, without `.bridge/`, onto a fresh branch from main:
+**A. Promote to a clean branch (recommended).** Copy only the net change, without `.bridge/`, onto a fresh branch from main. Use the script, or run the same steps by hand.
+
+*With the script.* From anywhere in the project:
+
+```bash
+sh .claude/skills/bridge-takeover/scripts/promote.sh bridge/<topic> --check "<your project's checks>"
+```
+
+`--check` takes the command you normally run to check the project, for example `--check "npm test"` or `--check "bash tests/run-all.sh"`; it is optional. The script refuses to start with uncommitted changes, an unknown branch, or an existing `feature/<topic>`. It stops with an error if nothing was staged, if `.bridge/` slipped in, or if the check fails, and tells you how to undo. When everything passes, it prints the commit and push commands; it never commits, pushes, or deletes anything itself. `--into <branch>` picks another name for the new branch, and `--base <ref>` another starting point than `origin/main`. The script is also in `.agents/skills/`, so either path works.
+
+Before you use the script:
+
+- **All platforms:** add the line `*.sh text eol=lf` to your project's `.gitattributes` (create the file if needed), so the script keeps Unix line endings wherever the project is cloned.
+- **Windows:** run it from **Git Bash** (installed with Git for Windows) or WSL, not PowerShell or cmd. If you see `$'\r': command not found`, the line above is missing: add it, then run `git add --renormalize .` and commit.
+
+*By hand:*
 
 ```bash
 git fetch origin
 git switch -c feature/<topic> origin/main
 git diff --binary origin/main...bridge/<topic> -- . ':(exclude).bridge' | git apply --index
 git status --short                     # must list the staged changes; if empty, the apply did nothing
-bash tests/run.sh                      # or your project's checks
+<your project's checks>                # for example: npm test, make test
 git commit -m "<what the work does>"
 git push -u origin feature/<topic>     # open the MR from this branch
 ```
@@ -279,6 +294,8 @@ Neither skill commits, pushes, or changes code on its own; the person stays in c
 skills/
   bridge-handoff/SKILL.md      # writes .bridge/HANDOVER.md
   bridge-takeover/SKILL.md     # reads it, or rebuilds intent from Git
+  bridge-takeover/scripts/
+    promote.sh                 # copies finished work onto a clean branch (POSIX sh)
 install.sh                     # pack extras (bash + jq), run by the hub installer
 install.js                     # pack extras (Node.js, same behaviour)
 templates/
@@ -294,7 +311,7 @@ tests/
 bash packs/bridge/tests/run.sh      # from the hub root; needs bash, node and jq
 ```
 
-The suite installs the pack through both hub installers into fresh, existing, and broken projects, checks that a re-run adds nothing twice and that `--target` and `--no-hook` reach the pack, and confirms that the handover template lives only in `bridge-handoff`. It stops early if `node` or `jq` is missing.
+The suite installs the pack through both hub installers into fresh, existing, and broken projects, checks that a re-run adds nothing twice and that `--target` and `--no-hook` reach the pack, and confirms that the handover template lives only in `bridge-handoff`. It also runs `promote.sh` against throwaway repositories: a normal promotion, main moving on in the meantime, `--into`, `--base` and `--check`, and every refusal. It stops early if `node` or `jq` is missing.
 
 ## Works alongside
 

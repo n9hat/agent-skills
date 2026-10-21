@@ -63,7 +63,7 @@ packs/
     templates/                   # files the pack extras write
     skills/
       bridge-handoff/SKILL.md
-      bridge-takeover/SKILL.md
+      bridge-takeover/SKILL.md, scripts/promote.sh
     tests/run.sh                 # tests for this pack
 tests/
   installer.sh                   # tests for the hub installers

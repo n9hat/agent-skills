@@ -152,7 +152,7 @@ mkdir -p .grok/skills && cp -R .agents/skills/bridge-* .grok/skills/
 Clone the hub once, then install the pack from inside the project you want to equip (all options are in the [hub README](../../README.md#installation)):
 
 ```bash
-git clone https://github.com/n9hat/agent-skills.git ~/agent-skills
+git clone --branch v0.1.0 https://github.com/n9hat/agent-skills.git ~/agent-skills
 
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash and jq
@@ -223,7 +223,7 @@ A merge request (MR) or pull request always shows everything that differs betwee
 
 **A. Promote to a clean branch (recommended).** Copy only the net change, without `.bridge/`, onto a fresh branch from main. Use the script, or run the same steps by hand.
 
-*With the script.* From anywhere in the project:
+*With the script* (needs Git 2.23 or later). From anywhere in the project:
 
 ```bash
 sh .claude/skills/bridge-takeover/scripts/promote.sh bridge/<topic> --check "<your project's checks>"

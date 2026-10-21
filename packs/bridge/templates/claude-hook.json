@@ -1,0 +1,4 @@
+{
+  "type": "command",
+  "command": "[ -f .bridge/HANDOVER.md ] && echo 'Bridge: .bridge/HANDOVER.md is present. Run /bridge-takeover before other work.' || true"
+}

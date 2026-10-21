@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Local secrets and machine-specific settings
+.env
+.env.*
+.claude/settings.local.json
+
+# Note: .bridge/HANDOVER.md is deliberately NOT ignored in projects that use the bridge;
+# it must be committed so the next person or machine receives it.

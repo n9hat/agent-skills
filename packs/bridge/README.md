@@ -46,6 +46,24 @@ Git already carries the code. What it does not carry is the context: why you cho
 
 The handover lives only on a bridge branch and never reaches your main branch, so old context cannot mislead anyone later (see [Bridge branches](#bridge-branches)).
 
+### What travels, and what does not
+
+- **Committed and pushed work** travels through Git. Nothing else does: until you push, nobody else receives the work or the handover.
+- **Uncommitted and unpushed work, stashes, local data and services, the environment variables a project needs:** these stay on your machine. The handover lists them under "Local only", so the next person knows what is missing, and the handoff reminds you to commit and push first.
+- **The session's context:** decisions with their reasons, open questions, questions answered along the way, and the next steps. The handover holds what the current session knows; it cannot read the chat history of earlier sessions or other tools. Each handoff reads the previous handover first and keeps what still holds, so context builds up across sessions as long as each session ends with a handoff.
+- **Secrets** never travel. Name environment variables in the handover, never their values.
+
+### How the handover stays the right size
+
+The handover is a snapshot of where the work stands now, not a log, so it neither keeps growing nor loses context:
+
+- Each handoff keeps the decisions still in force, the open questions still open, and the next steps not yet done, and drops what is finished or answered.
+- It aims for about one screen. A decision that should outlive the branch belongs in the project's own docs, and the handover points to it by path.
+- Git keeps every earlier version: `git log -p .bridge/HANDOVER.md`.
+- It lasts as long as one piece of work. After the work is promoted, the bridge branch is deleted, and the next topic starts with a fresh handover.
+
+If a takeover finds a handover written for a different branch, it says so and asks before using it. If the answer is no, it sets the file aside and carries on as usual; the next handoff replaces it.
+
 ## Supported scenarios
 
 ### 1. Timezone handoffs
@@ -194,6 +212,8 @@ main ──●──────────────────────
 2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push.
 3. **Next session, anywhere:** `git pull`, run `/bridge-takeover`, and carry on.
 4. Repeat for as many days as the work takes. The handover is replaced each time, so there is only ever one copy.
+
+Each bridge branch carries its own handover, so one person can hand over several pieces of work at once, one branch each. To see which are waiting: `git fetch --prune && git branch -r --list 'origin/bridge/*'`.
 
 Two rules keep the noise out of your main branch: **handover commits touch only `.bridge/`**, and **work commits never touch `.bridge/`**.
 

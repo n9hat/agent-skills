@@ -9,17 +9,18 @@ Record where this branch stands, in plain language, so whoever continues it, wit
 
 ## Steps
 
-1. **Inspect the branch.** Run `git status`, `git diff` (staged and unstaged), `git log --oneline -10`, and `git status -sb` for the branch and whether it is ahead of its upstream. Record the push state as it really is.
-2. **Find the contracts.** API specs, shared types or interfaces, schemas, plans, ADRs. Reference them by path; do not copy them.
-3. **State the truth about the build.** Run the project's quick, known checks and record the result, or write "not run".
-4. **Write `.bridge/HANDOVER.md`** from the template below, replacing any previous version.
-   - Plain language. Explain any workflow jargon (beads, tickets, spec IDs, phases) or point to the file instead.
-   - Record decisions with their reason, open questions, and anything that so far exists only in your head.
-   - Leave out secrets and personal data.
-5. **Hand it back to the user.** Show the file. Uncommitted work goes in its own commit(s) first; the handover then gets a commit that touches only `.bridge/`, so it can be left out when the work moves to the main branch:
+1. **Inspect the branch.** `git status -sb`, `git diff` (staged and unstaged), `git stash list`, and for the whole branch `git log --oneline origin/main..HEAD` and `git diff --stat origin/main...HEAD`. Record the push state as it really is.
+2. **Read the previous handover**, if any. Keep decisions in force, open questions and unfinished steps; drop what is done or answered (an answer that shaped the work becomes a decision).
+3. **Find the contracts.** API specs, shared types or interfaces, schemas, plans, ADRs. Reference them by path; do not copy them.
+4. **State the truth about the build.** Run the project's quick, known checks and record the result, or write "not run".
+5. **Write `.bridge/HANDOVER.md`** from the template below, replacing the previous version: a snapshot of now, not a log, about one screen long.
+   - Plain language; explain workflow jargon (beads, tickets, spec IDs) or point to the file.
+   - Record decisions with their reason, open and answered questions, and anything that so far exists only in your head. Lasting decisions belong in the project's docs; point to them.
+   - No secrets or personal data: name environment variables, never their values.
+6. **Hand it back to the user.** Show the file. Uncommitted work goes in its own commit(s) first; the handover then gets a commit that touches only `.bridge/`, so it can be left out when the work moves to the main branch:
    `git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" && git push`.
-   Do not commit or push yourself unless the user asks.
-6. **Warn about broken shared code** in "Current state" and in your reply.
+   If anything is still unpushed, say so: until it is pushed, nobody else receives it. Do not commit or push yourself unless the user asks.
+7. **Warn about broken shared code** in "Current state" and in your reply.
 
 ## Rules
 
@@ -47,6 +48,7 @@ Record where this branch stands, in plain language, so whoever continues it, wit
 - Created: <paths>
 - Modified shared modules: <paths>
 - Current state: <for example "builds; integration tests 4 and 5 fail">
+- Local only: <uncommitted files, unpushed commits, stashes, environment variable names needed, local data or services; or "none">
 
 ## 3. Decisions and open questions
 - Decided: <decision> (reason: <why>)

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Documentation:** the README opens with a quick start and a table of contents, and adds "Git as a brain-state cache", a diagram, scenarios, a workflow table, and an FAQ. New `llms.txt` summarises the repository for AI tools. The bridge README gains a table of contents. The away (sick-leave) scenario is renamed in the READMEs and the handover template.
+
 ## 0.1.0 · 2026-10-21
 
 First release.

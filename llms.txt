@@ -1,0 +1,36 @@
+# Agent Skills
+
+> Installable SKILL.md skills for AI coding agents that hand work over through Git. The `bridge` pack writes a branch's working context into one committed file, `.bridge/HANDOVER.md` (`/bridge-handoff`), and reads it back on another machine or for another person (`/bridge-takeover`). Everyone keeps their own way of working. MIT licence. Current release: v0.1.0.
+
+## Capabilities
+
+- `bridge-handoff`: inspects git status, diffs, stashes, branch log, contracts and build checks; writes `.bridge/HANDOVER.md` (goal, contracts, footprint, current state, local-only items, decisions, open questions, next steps). Replaces the previous handover and keeps what still holds. Does not commit or push on its own.
+- `bridge-takeover`: fetches, reads the handover, flags drift against the repo, checks contracts, and proposes the next three steps in the reader's workflow (tasks, beads, or a spec change). With no handover, rebuilds intent from commits and labels it "inferred". Waits for agreement before changing code.
+- `promote.sh`: copies the finished work from `bridge/<topic>` onto a clean `feature/<topic>` branch without `.bridge/`; stages only, never commits or pushes.
+
+## Triggers
+
+- "bridge handoff", `/bridge-handoff` (Claude Code), `$bridge-handoff` (Codex)
+- "bridge takeover", `/bridge-takeover`, `$bridge-takeover`; also when `.bridge/HANDOVER.md` is present
+
+## Data model
+
+- `.bridge/HANDOVER.md`, Markdown, about one screen: header (branch, last commit, pushed, author, date, scenario, tools) + 1 Goal and boundaries, 2 Code footprint, 3 Decisions and open questions, 4 Next steps.
+- Scenario values: timezone handoff, away (sick-leave) cover, device switch, other.
+- One handover per bridge branch. Committed on its own (`bridge: handoff`); never merged to main.
+
+## Boundaries
+
+- Only pushed work travels; uncommitted work, stashes, local data and secrets stay on the machine (listed under "Local only"; secrets by name only).
+- Per repository and per project install; no cross-repository handover.
+- Several sessions on one branch share one handover: hand off one at a time, or use one bridge branch per area.
+- Requires Git 2.23+, and Node.js 16.7+ (`install.js`) or bash + jq (`install.sh`).
+- Tested hands-on: Claude Code on Linux and WSL Ubuntu. Not yet run: Codex, Copilot, Gemini CLI, Grok Build, macOS, Windows outside WSL.
+
+## Docs
+
+- [README](https://github.com/n9hat/agent-skills/blob/main/README.md): overview, quick start, scenarios, FAQ
+- [Bridge pack](https://github.com/n9hat/agent-skills/blob/main/packs/bridge/README.md): full usage, bridge branches, merging, tool support
+- [bridge-handoff SKILL.md](https://github.com/n9hat/agent-skills/blob/main/packs/bridge/skills/bridge-handoff/SKILL.md): handover template
+- [bridge-takeover SKILL.md](https://github.com/n9hat/agent-skills/blob/main/packs/bridge/skills/bridge-takeover/SKILL.md)
+- [CHANGELOG](https://github.com/n9hat/agent-skills/blob/main/CHANGELOG.md)

@@ -4,6 +4,28 @@ The **cross-team bridge**: two small skills, `bridge-handoff` and `bridge-takeov
 
 ---
 
+## Contents
+
+- [Why this exists](#why-this-exists)
+- [How it works](#how-it-works)
+- [Where a handover works](#where-a-handover-works)
+- [Supported scenarios](#supported-scenarios)
+- [What's inside](#whats-inside)
+- [Tool support](#tool-support)
+- [Installation](#installation)
+- [The handover file](#the-handover-file)
+- [Bridge branches](#bridge-branches)
+  - [The back-and-forth loop](#the-back-and-forth-loop)
+  - [Merging the finished work](#merging-the-finished-work)
+  - [Public repositories](#public-repositories)
+- [Ground rules](#ground-rules)
+- [Tested so far](#tested-so-far)
+- [Known limitations](#known-limitations)
+- [Pack layout](#pack-layout)
+- [Testing](#testing)
+- [Works alongside](#works-alongside)
+- [License](#license)
+
 ## Why this exists
 
 Teams rarely work the same way. One developer plans every change with a **plan-first skill pack**, another drives a **task graph of beads**, a third writes **specs before code**, a fourth keeps a **personal skill collection**, and someone else is simply **vibe-coding** with no framework at all. Each workflow leaves its own trail of jargon, files, and half-finished state: a plan file here, a bead tracker there, a specs folder, a chat history on one laptop.
@@ -34,7 +56,7 @@ The bridge answers them with one plain-language file, committed to the branch, a
 2. **Commit and push** your work, then the handover in a commit of its own, on a [bridge branch](#bridge-branches).
 3. **Take over.** The next person (or you, on another machine) pulls and runs `/bridge-takeover` (or says "bridge takeover"). The agent checks the handover against the current repo, flags anything that has drifted, and proposes the next three steps translated into that person's own workflow: beads for a task-graph workflow, a spec change for a spec-first one, a plain task list for a vibe-coder.
 
-If there is no handover at all, for example because someone went off sick without warning, `/bridge-takeover` rebuilds the previous intent from recent commits, diffs, and references, and labels everything it inferred.
+If there is no handover at all, for example because someone is suddenly away (sick leave), `/bridge-takeover` rebuilds the previous intent from recent commits, diffs, and references, and labels everything it inferred.
 
 ## Where a handover works
 
@@ -76,9 +98,9 @@ If a takeover finds a handover written for a different branch, it says so and as
 
 Follow-the-sun works because the handover says *why*, not just *what*, so the next person does not redo or undo decisions made while they were asleep.
 
-### 2. Emergency sick-leave takeovers
+### 2. Emergency takeovers: away (sick-leave)
 
-*A developer is suddenly off sick, mid-feature, with no handover written.*
+*A developer is suddenly away, for example on sick leave, mid-feature, with no handover written.*
 
 1. A teammate checks out the branch and runs `/bridge-takeover`.
 2. With no `.bridge/HANDOVER.md`, the agent reconstructs the intent from the last commits, their diffs, the branch name, issue or merge-request references, and TODOs in the changed files. Every inferred statement is labelled "inferred".
@@ -123,7 +145,7 @@ The names carry a `bridge-` prefix on purpose: they do not collide with other po
 
 The skills follow the open `SKILL.md` format. The installer places them where each tool looks for them, and adds a startup reminder so the next session notices a waiting handover.
 
-**Only Claude Code has been tested so far.** The other rows come from each tool's documentation, not from a hands-on run; see [Tested so far](#tested-so-far).
+The "Tested" column follows [Tested so far](#tested-so-far); the other rows come from each tool's documentation.
 
 | Tool | Tested | Reads the skills from | Run it with | Startup reminder |
 |---|---|---|---|---|
@@ -181,7 +203,7 @@ Commit the installed files so everyone who clones the project gets the bridge. A
 
 - Branch: <branch> · Last commit: <short sha> <subject> · Pushed: <yes | no>
 - Written by: <name> · <date, time and timezone>
-- Scenario: <timezone handoff | sick-leave cover | device switch | other>
+- Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
 
 ## 1. Goal and boundaries

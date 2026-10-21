@@ -36,7 +36,7 @@ Record where this branch stands, in plain language, so whoever continues it, wit
 
 - Branch: <branch> · Last commit: <short sha> <subject> · Pushed: <yes | no>
 - Written by: <name> · <date, time and timezone>
-- Scenario: <timezone handoff | sick-leave cover | device switch | other>
+- Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
 
 ## 1. Goal and boundaries

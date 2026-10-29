@@ -10,6 +10,7 @@ PACK="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATES="$PACK/templates"
 SETTINGS=".claude/settings.json"
 NOTE_MARKER="<!-- bridge:begin -->"
+NOTE_END="<!-- bridge:end -->"
 
 TARGET="$PWD"
 WITH_HOOK=1
@@ -26,9 +27,30 @@ done
 [ -d "$TARGET" ] || { echo "Target is not a directory: $TARGET" >&2; exit 2; }
 cd "$TARGET" || exit 2
 
+# Replace an existing note in place, so a re-run after an upgrade brings in the current wording.
+update_agents_note() {
+  local note="$TEMPLATES/agents-note.md" tmp
+  if ! grep -qF "$NOTE_END" AGENTS.md; then
+    echo "AGENTS.md has '$NOTE_MARKER' but no '$NOTE_END'; left unchanged. Fix the note and re-run." >&2
+    exit 1
+  fi
+  tmp="$(mktemp)"
+  awk -v begin="$NOTE_MARKER" -v end="$NOTE_END" -v note="$note" '
+    !skip && index($0, begin) { while ((getline line < note) > 0) print line; skip = 1 }
+    !skip { print }
+    skip && index($0, end) { skip = 0 }' AGENTS.md > "$tmp"
+  if cmp -s "$tmp" AGENTS.md; then
+    echo "AGENTS.md already has the current bridge note"
+  else
+    cat "$tmp" > AGENTS.md
+    echo "Updated the bridge note in AGENTS.md"
+  fi
+  rm -f "$tmp"
+}
+
 add_agents_note() {
   if [ -f AGENTS.md ] && grep -qF "$NOTE_MARKER" AGENTS.md; then
-    echo "AGENTS.md already has the bridge note"
+    update_agents_note
     return
   fi
   if [ -s AGENTS.md ]; then echo >> AGENTS.md; fi

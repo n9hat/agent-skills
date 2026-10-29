@@ -9,19 +9,29 @@ Continue someone else's work, or your own from another machine, without losing m
 
 ## Steps
 
-1. **Sync safely.** Run `git fetch --prune` and `git status`; report whether the branch is behind or ahead of its upstream, and any local branch whose upstream is gone. If there are local changes, ask before pulling, resetting, or switching branches. If Git refuses the repository (for example "dubious ownership" on a `\\wsl.localhost` path), run Git inside that environment, such as `wsl.exe -- git ...`, rather than changing global Git config.
+1. **Sync safely.** Run `git fetch --prune` and `git status`; report whether the branch is behind or ahead of its upstream, and any local branch whose upstream is gone. If there are local changes, ask before pulling, resetting, or switching branches. If Git refuses the repository (for example "dubious ownership" when the repository lives in another environment, such as WSL or a container), run Git inside that environment rather than changing global Git config.
 2. **Read the handover, if there is one.** Check `.bridge/HANDOVER.md` against the repo:
    - If its "Branch:" line matches neither the current branch nor its upstream, it is probably from other work: ask before using it. If the user says no, set it aside (the next handoff replaces it) and carry on as usual; rebuild the intent (step 3) only if asked.
    - Commits after its "Last commit" are work done since the handoff; summarise them. The `bridge:` commit that added the handover itself is expected, not drift.
-   - Do the files it lists exist? Do its push state and "Current state" still hold? Run the project's quick, known checks.
-3. **Otherwise, rebuild the intent** from the branch's commits since it left the main branch (`git log --stat origin/main..HEAD`), the diffs, the branch name, issue references in commit messages, and TODOs in changed files. Label everything you infer as "inferred".
+   - Do the files it lists exist? Do its push state and "Current state" still hold? Run the project's quick checks: the ones the handover names, or else those its README, AGENTS.md or CLAUDE.md names, or the test and lint commands in its package scripts, Makefile or CI config.
+3. **Otherwise, rebuild the intent.** Find the main branch (`git symbolic-ref --short refs/remotes/origin/HEAD`, usually `origin/main`, or ask if it is not set; below it is `<main>`), then read the branch's commits since it left it (`git log --stat <main>..HEAD`), the diffs, the branch name, issue references in commit messages, and TODOs in changed files. Label everything you infer as "inferred".
 4. **Check against the contracts** the handover lists or that you find.
-5. **Report back:** where things stand in a few lines; what no longer matches the repo; the next three steps; questions for the previous owner. Express the plan in the user's own workflow (tasks, beads, a spec change); if you cannot tell which, ask.
+5. **Report back** in this shape, keeping each part to a few lines:
+
+   ```markdown
+   **Where things stand:** <state, and the checks you ran with their result>
+   **Since the handover:** <commits after "Last commit", or "nothing">
+   **No longer matches the repo:** <drift, or "nothing found">
+   **Next three steps:** <in the user's own workflow>
+   **Questions for <previous owner>:** <or "none">
+   ```
+
+   Express the steps in the user's own workflow (tasks, beads, a spec change); if you cannot tell which, ask.
 6. **Wait for agreement.** Do not change code until the user agrees with the plan.
-7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it to a clean branch so `.bridge/` never reaches the main branch, with `sh <this skill's folder>/scripts/promote.sh <bridge-branch> --check "<project's checks>"`, run from anywhere in the project. It stages the work and stops; the user commits and pushes.
+7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it to a clean branch so `.bridge/` never reaches the main branch, with `sh <this skill's folder>/scripts/promote.sh <bridge-branch> --check "<project's checks>"`, run from anywhere in the project; add `--base <main>` when the main branch is not `origin/main`. It stages the work and stops; the user commits and pushes.
 
 ## Rules
 
-- **Contracts first.** Shared API specs and interface or type files win over logic on the feature branch.
-- **Never push a broken shared module.** If shared code fails, keep the fix or a stand-in (test double) inside your own area until it is resolved.
-- **Tool-neutral.** Judge the work by whether it builds and passes its tests, not by which tool or method produced it.
+- **Contracts first.** When the branch's code and a shared contract (API spec, interface or type file) disagree, change the code, not the contract, unless the user agrees: other people build against the contract.
+- **Never push a broken shared module.** Others pull shared code straight away, so a break there stops them too. If shared code fails, keep the fix or a stand-in (test double) inside your own area until it is resolved.
+- **Tool-neutral.** Judge the work by whether it builds and passes its tests, not by which tool or method produced it: the next person may use a different one.

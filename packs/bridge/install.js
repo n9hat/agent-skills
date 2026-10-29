@@ -13,6 +13,7 @@ const path = require('path');
 const TEMPLATES = path.join(__dirname, 'templates');
 const SETTINGS = path.join('.claude', 'settings.json');
 const NOTE_MARKER = '<!-- bridge:begin -->';
+const NOTE_END = '<!-- bridge:end -->';
 
 function fail(message, code) {
   console.error(message);
@@ -38,14 +39,32 @@ function parseArgs(argv) {
   return opts;
 }
 
+// Replace an existing note in place, so a re-run after an upgrade brings in the current wording.
+function updateAgentsNote(file, existing, note) {
+  const begin = existing.lastIndexOf('\n', existing.indexOf(NOTE_MARKER)) + 1;
+  const endMarker = existing.indexOf(NOTE_END, begin);
+  if (endMarker < 0) {
+    fail(`AGENTS.md has '${NOTE_MARKER}' but no '${NOTE_END}'; left unchanged. Fix the note and re-run.`, 1);
+  }
+  const lineEnd = existing.indexOf('\n', endMarker);
+  const end = lineEnd < 0 ? existing.length : lineEnd + 1;
+  const updated = existing.slice(0, begin) + note + existing.slice(end);
+  if (updated === existing) {
+    console.log('AGENTS.md already has the current bridge note');
+    return;
+  }
+  fs.writeFileSync(file, updated);
+  console.log('Updated the bridge note in AGENTS.md');
+}
+
 function addAgentsNote() {
   const file = 'AGENTS.md';
   const existing = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+  const note = fs.readFileSync(path.join(TEMPLATES, 'agents-note.md'), 'utf8');
   if (existing.includes(NOTE_MARKER)) {
-    console.log('AGENTS.md already has the bridge note');
+    updateAgentsNote(file, existing, note);
     return;
   }
-  const note = fs.readFileSync(path.join(TEMPLATES, 'agents-note.md'), 'utf8');
   fs.appendFileSync(file, (existing.length > 0 ? '\n' : '') + note);
   console.log('Added the bridge note to AGENTS.md');
 }

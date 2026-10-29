@@ -187,10 +187,10 @@ Add `--no-hook` to skip the Claude Code hook in `.claude/settings.json`.
 Installing the bridge:
 
 1. copies both skills into `.agents/skills/` and `.claude/skills/`;
-2. appends a short bridge note to `AGENTS.md` (creating it if needed) that tells every agent to run `bridge-takeover` when a handover is waiting;
+2. adds a short bridge note to `AGENTS.md` (creating it if needed) that tells every agent to run `bridge-takeover` when a handover is waiting;
 3. merges a `SessionStart` hook into `.claude/settings.json` that prints a reminder when `.bridge/HANDOVER.md` exists, keeping all existing settings and hooks.
 
-It is safe to run again: skills are refreshed in place, and the note and hook are never added twice. If `.claude/settings.json` is not valid JSON, the installer stops without touching it. If `jq` is missing, `install.sh` prints the hook for you to add by hand instead of editing the file.
+It is safe to run again: skills and the `AGENTS.md` note are refreshed in place, so re-running after an upgrade brings in the current wording, and the note and hook are never added twice. If `.claude/settings.json` is not valid JSON, or the note in `AGENTS.md` has lost its `<!-- bridge:end -->` line, the installer stops without touching that file. If `jq` is missing, `install.sh` prints the hook for you to add by hand instead of editing the file.
 
 Commit the installed files so everyone who clones the project gets the bridge. Agents load skills when a session starts, so start a new session in the project after installing; one that was already open will not see the commands. Open the project folder itself: a session opened at a parent folder, such as `~/projects/`, does not see the bridge.
 
@@ -202,7 +202,7 @@ Commit the installed files so everyone who clones the project gets the bridge. A
 # Bridge Handover
 
 - Branch: <branch> · Last commit: <short sha> <subject> · Pushed: <yes | no>
-- Written by: <name> · <date, time and timezone>
+- Written by: <name or handle> · <date, time and timezone>
 - Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
 
@@ -231,7 +231,7 @@ main ──●──────────────────────
 ```
 
 1. Start once: `git switch -c bridge/<topic> origin/main`.
-2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push.
+2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push. The path after `--` keeps anything else that is staged out of the handover commit.
 3. **Next session, anywhere:** `git pull`, run `/bridge-takeover`, and carry on.
 4. Repeat for as many days as the work takes. The handover is replaced each time, so there is only ever one copy.
 
@@ -368,7 +368,7 @@ tests/
 bash packs/bridge/tests/run.sh      # from the hub root; needs bash, node and jq
 ```
 
-The suite installs the pack through both hub installers into fresh, existing, and broken projects, checks that a re-run adds nothing twice and that `--target` and `--no-hook` reach the pack, and confirms that the handover template lives only in `bridge-handoff`. It also runs `promote.sh` against throwaway repositories: a normal promotion, main moving on in the meantime, `--into`, `--base` and `--check`, and every refusal. It stops early if `node` or `jq` is missing.
+The suite installs the pack through both hub installers into fresh, existing, and broken projects, checks that a re-run adds nothing twice, replaces an older `AGENTS.md` note the same way from both installers, and refuses a note with no end marker, checks that `--target` and `--no-hook` reach the pack, and confirms that the handover template lives only in `bridge-handoff` and that the rules match in both skills. It also runs `promote.sh` against throwaway repositories: a normal promotion, main moving on in the meantime, `--into`, `--base` and `--check`, and every refusal. It stops early if `node` or `jq` is missing.
 
 ## Works alongside
 

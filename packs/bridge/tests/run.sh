@@ -54,6 +54,11 @@ template() { sed -n '/<!-- bridge-template:start -->/,/<!-- bridge-template:end 
 check "HANDOVER template present in bridge-handoff" test -n "$(template "$PACK/skills/bridge-handoff/SKILL.md")"
 check "HANDOVER template kept in one place" test -z "$(template "$PACK/skills/bridge-takeover/SKILL.md")"
 
+rules() { awk '/^## /{p = ($0 == "## Rules")} p' "$1"; }
+check "Rules present in bridge-handoff" test -n "$(rules "$PACK/skills/bridge-handoff/SKILL.md")"
+check "Rules identical in both skills" \
+  test "$(rules "$PACK/skills/bridge-handoff/SKILL.md")" = "$(rules "$PACK/skills/bridge-takeover/SKILL.md")"
+
 # --- Installed through the hub ----------------------------------------------
 for kind in sh js; do
   # Fresh install
@@ -71,6 +76,24 @@ for kind in sh js; do
   run_installer "$kind" "$t" >/dev/null 2>&1
   check "$kind rerun: one AGENTS.md note" test "$(grep -cF '<!-- bridge:begin -->' "$t/AGENTS.md")" = 1
   check "$kind rerun: still one bridge hook" test "$(bridge_hook_count "$t/.claude/settings.json")" = 1
+
+  # Upgrade: an older note is replaced in place; the rest of AGENTS.md is kept
+  t="$(new_target "$kind-upgrade")"
+  printf '# Team rules\nKeep it tidy.\n\n<!-- bridge:begin -->\nOld bridge wording.\n<!-- bridge:end -->\n\n## After\nStill here.\n' > "$t/AGENTS.md"
+  check "$kind upgrade: installer exits 0" run_installer "$kind" "$t" --no-hook
+  check "$kind upgrade: old wording gone" fails grep -qF 'Old bridge wording.' "$t/AGENTS.md"
+  check "$kind upgrade: current note present" grep -qF "$(sed -n 2p "$PACK/templates/agents-note.md")" "$t/AGENTS.md"
+  check "$kind upgrade: one note" test "$(grep -cF '<!-- bridge:begin -->' "$t/AGENTS.md")" = 1
+  check "$kind upgrade: text before kept" grep -qx 'Keep it tidy.' "$t/AGENTS.md"
+  check "$kind upgrade: text after kept" grep -qx 'Still here.' "$t/AGENTS.md"
+  cp "$t/AGENTS.md" "$WORK/$kind-upgraded.md"
+
+  # A note with no end marker is refused and left untouched
+  t="$(new_target "$kind-broken-note")"
+  printf '# Team rules\n<!-- bridge:begin -->\nOld bridge wording.\n' > "$t/AGENTS.md"
+  cp "$t/AGENTS.md" "$WORK/$kind-broken-before.md"
+  check "$kind broken note: installer exits nonzero" fails run_installer "$kind" "$t" --no-hook
+  check "$kind broken note: AGENTS.md unchanged" cmp -s "$t/AGENTS.md" "$WORK/$kind-broken-before.md"
 
   # Existing files are preserved
   t="$(new_target "$kind-existing")"
@@ -104,6 +127,7 @@ for kind in sh js; do
   check "$kind --target: hook lands in target" test -f "$t/.claude/settings.json"
   check "$kind --target: nothing written to cwd" test ! -e "$WORK/AGENTS.md"
 done
+check "upgrade: sh and js installers write the same AGENTS.md" cmp -s "$WORK/sh-upgraded.md" "$WORK/js-upgraded.md"
 
 # --- promote.sh: copy a bridge branch's work onto a clean branch --------------
 PROMOTE="$PACK/skills/bridge-takeover/scripts/promote.sh"

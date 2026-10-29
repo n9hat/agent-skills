@@ -99,6 +99,13 @@ for kind in sh js; do
   check "$kind broken note: installer exits nonzero" fails run_installer "$kind" "$t" --no-hook
   check "$kind broken note: AGENTS.md unchanged" cmp -s "$t/AGENTS.md" "$WORK/$kind-broken-before.md"
 
+  # Two notes are refused rather than one being silently dropped or kept stale
+  t="$(new_target "$kind-two-notes")"
+  printf '<!-- bridge:begin -->\nA\n<!-- bridge:end -->\n\n<!-- bridge:begin -->\nB\n<!-- bridge:end -->\n' > "$t/AGENTS.md"
+  cp "$t/AGENTS.md" "$WORK/$kind-two-before.md"
+  check "$kind two notes: installer exits nonzero" fails run_installer "$kind" "$t" --no-hook
+  check "$kind two notes: AGENTS.md unchanged" cmp -s "$t/AGENTS.md" "$WORK/$kind-two-before.md"
+
   # Existing files are preserved
   t="$(new_target "$kind-existing")"
   mkdir -p "$t/.claude"
@@ -232,6 +239,57 @@ out="$(promote "$r" bridge/topic 2>&1)"; code=$?
 check "promote behind its remote: refused" test "$code" = 1
 check "promote behind its remote: says how to pull" grep -q 'git pull --ff-only' <<<"$out"
 check "promote behind its remote: no branch created" fails branch_exists "$r" feature/topic
+
+# The check follows the branch's real upstream, even under another local name
+r="$(new_repo renamed)"
+git -C "$r" push -q origin bridge/topic 2>/dev/null
+git -C "$r" branch -q --track mywork origin/bridge/topic
+git clone -q "$r.git" "$r-other" 2>/dev/null
+(cd "$r-other" && git switch -q bridge/topic && echo more > more.txt && git add more.txt \
+  && git commit -qm more && git push -q origin bridge/topic)
+check "promote renamed upstream: refused" fails promote "$r" mywork
+check "promote renamed upstream: no branch created" fails branch_exists "$r" feature/mywork
+
+# Diverged: a fast-forward pull cannot fix it, so the message says merge or rebase
+r="$(new_repo diverged)"
+git -C "$r" push -q -u origin bridge/topic 2>/dev/null
+git clone -q "$r.git" "$r-other" 2>/dev/null
+(cd "$r-other" && git switch -q bridge/topic && echo theirs > theirs.txt && git add theirs.txt \
+  && git commit -qm theirs && git push -q origin bridge/topic)
+(cd "$r" && git switch -q bridge/topic && echo mine > mine.txt && git add mine.txt \
+  && git commit -qm mine && git switch -q main)
+out="$(promote "$r" bridge/topic 2>&1)"
+check "promote diverged: refused" fails branch_exists "$r" feature/topic
+check "promote diverged: says merge or rebase" grep -q 'merge or rebase' <<<"$out"
+
+# Offline with a local base: warn and carry on, as before the remote check existed
+r="$(new_repo offline)"
+git -C "$r" push -q -u origin bridge/topic 2>/dev/null
+git -C "$r" remote set-url origin "$WORK/nowhere.git"
+out="$(promote "$r" bridge/topic --base main 2>&1)"; code=$?
+check "promote offline, local base: exits 0" test "$code" = 0
+check "promote offline, local base: warns it could not fetch" grep -q 'could not fetch origin' <<<"$out"
+
+# The printed undo works after a failed check, even when main changed the same file
+r="$(new_repo undo)"
+(cd "$r" && printf '1\n2\n3\n4\n5\n' > f.txt && git add f.txt && git commit -qm f && git push -q origin main \
+  && git switch -qc bridge/f && sed -i 's/^1$/one/' f.txt && git commit -qam one \
+  && git switch -q main && sed -i 's/^5$/five/' f.txt && git commit -qam five && git push -q origin main \
+  && git reset -q --hard HEAD~1)   # local main is now behind origin/main, the promote base
+out="$(promote "$r" bridge/f --check false 2>&1)"
+check "promote undo after failed check: runs" sh -c "cd '$r' && ${out##*undo: }"
+check "promote undo after failed check: back on main" test "$(current "$r")" = main
+check "promote undo after failed check: nothing left staged" test -z "$(staged "$r")"
+check "promote undo after failed check: branch removed" fails branch_exists "$r" feature/f
+
+# The printed undo returns to a detached start too
+r="$(new_repo undo-detached)"
+git -C "$r" switch -q --detach main
+start="$(git -C "$r" rev-parse HEAD)"
+out="$(promote "$r" bridge/topic --check false 2>&1)"
+check "promote undo from detached HEAD: runs" sh -c "cd '$r' && ${out##*undo: }"
+check "promote undo from detached HEAD: back at the start" test "$(git -C "$r" rev-parse HEAD)" = "$start"
+check "promote undo from detached HEAD: branch removed" fails branch_exists "$r" feature/topic
 
 # Fork layout: base on upstream, bridge branch on origin; the push hint names origin
 r="$(new_repo fork)"

@@ -30,6 +30,10 @@ cd "$TARGET" || exit 2
 # Replace an existing note in place, so a re-run after an upgrade brings in the current wording.
 update_agents_note() {
   local note="$TEMPLATES/agents-note.md" tmp
+  if [ "$(grep -cF "$NOTE_MARKER" AGENTS.md)" -gt 1 ]; then
+    echo "AGENTS.md has more than one '$NOTE_MARKER'; left unchanged. Keep one bridge note and re-run." >&2
+    exit 1
+  fi
   if ! grep -qF "$NOTE_END" AGENTS.md; then
     echo "AGENTS.md has '$NOTE_MARKER' but no '$NOTE_END'; left unchanged. Fix the note and re-run." >&2
     exit 1

@@ -48,15 +48,16 @@ remote="$(git config "branch.$source_branch.remote" || echo origin)"
 if ! git remote | grep -qx "$remote"; then
   remote="<remote>"
 elif [ "$remote" != "$base_remote" ]; then
-  git fetch --quiet "$remote" || die "could not fetch $remote"
+  git fetch --quiet "$remote" \
+    || echo "promote: could not fetch $remote; checking $source_branch against what was fetched last" >&2
 fi
 
 git rev-parse -q --verify "$source_branch^{commit}" >/dev/null || die "no branch named $source_branch"
 # Someone else may have pushed last: promoting a local copy that lacks their commits would drop them.
-tracking="refs/remotes/$remote/$source_branch"
-if git rev-parse -q --verify "$tracking" >/dev/null \
-  && ! git merge-base --is-ancestor "$tracking" "$source_branch"; then
-  die "$source_branch is missing commits from $remote/$source_branch. Get them first: git switch $source_branch && git pull --ff-only"
+upstream="$(git rev-parse --symbolic-full-name "$source_branch@{u}" 2>/dev/null)" || upstream=""
+if [ -n "$upstream" ] && git rev-parse -q --verify "$upstream" >/dev/null \
+  && ! git merge-base --is-ancestor "$upstream" "$source_branch"; then
+  die "$source_branch is missing commits from ${upstream#refs/remotes/}. Get them first: git switch $source_branch && git pull --ff-only (merge or rebase instead if both sides have new commits)"
 fi
 git rev-parse -q --verify "$base^{commit}" >/dev/null || die "no base named $base"
 ! git rev-parse -q --verify "refs/heads/$into" >/dev/null \
@@ -67,8 +68,14 @@ trap 'rm -f "$patch"' EXIT
 git diff --binary "$base...$source_branch" -- . ':(exclude).bridge' > "$patch"
 [ -s "$patch" ] || die "$source_branch has no changes to promote outside .bridge/"
 
+# The undo drops the staged copy first; otherwise switching back can refuse to overwrite it.
+if start="$(git symbolic-ref -q --short HEAD)"; then
+  back="git switch $start"
+else
+  back="git switch --detach $(git rev-parse HEAD)"
+fi
 git switch --quiet --no-track -c "$into" "$base"
-undo="git switch - && git branch -D $into"
+undo="git reset --quiet --hard && $back && git branch -D $into"
 git apply --index "$patch" || die "the changes did not apply cleanly. To undo: $undo"
 
 ! git diff --cached --quiet || die "nothing was staged. To undo: $undo"

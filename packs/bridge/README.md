@@ -71,7 +71,7 @@ The handover lives only on a bridge branch and never reaches your main branch, s
 ### What travels, and what does not
 
 - **Committed and pushed work** travels through Git. Nothing else does: until you push, nobody else receives the work or the handover.
-- **Uncommitted and unpushed work, stashes, local data and services, the environment variables a project needs:** these stay on your machine. The handover lists them under "Local only", so the next person knows what is missing, and the handoff reminds you to commit and push first.
+- **Uncommitted work, stashes, local data and services, the environment variables a project needs:** these stay on your machine. The handoff asks you to commit your work first and lists whatever you leave behind under "Local only", so the next person knows what is missing; nothing travels until you push.
 - **The session's context:** decisions with their reasons, open questions, questions answered along the way, and the next steps. The handover holds what the current session knows; it cannot read the chat history of earlier sessions or other tools. Each handoff reads the previous handover first and keeps what still holds, so context builds up across sessions as long as each session ends with a handoff.
 - **Secrets** never travel. Name environment variables in the handover, never their values.
 

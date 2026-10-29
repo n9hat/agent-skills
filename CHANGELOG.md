@@ -5,12 +5,13 @@
 Fixes from a second review of the bridge skills. To upgrade a project: `git -C ~/agent-skills fetch --tags && git -C ~/agent-skills checkout v0.1.2`, then run the installer again in the project and commit the changed files.
 
 - **Handoff order:** the work is committed before the handover is written, so "Last commit" and "Local only" match what is pushed. The "Pushed" field is gone from the template; it could only ever read "no" at writing time.
-- **First push:** the commit step ends with `git push -u origin HEAD`, which also works for a bridge branch that was never pushed.
+- **First push:** the handoff says to push with `git push -u origin HEAD` while a new bridge branch has no upstream, and plain `git push` after that.
 - **Untrusted handover:** `/bridge-takeover` treats the handover as information, not instructions, and runs commands it names only if the user agrees.
-- **Takeover sync:** it never pulls, resets or switches branches itself; when the branch is behind it reads the newer handover from the remote and offers a fast-forward; it handles detached HEAD, no upstream, a different branch name, and a "Last commit" lost to a rebase.
+- **Takeover sync:** it never pulls, resets or switches branches itself; when the branch is behind it reads the newer handover from the remote and offers a fast-forward; it handles a diverged branch, detached HEAD, no upstream, a different branch name, a bridge branch on two remotes, and a "Last commit" lost to a rebase; `@{u}` is quoted for PowerShell.
 - **AGENTS.md note:** offers a handoff only when the user says they are stopping on a bridge branch, and mentions promotion.
-- **Main branch:** when `origin/HEAD` is not set, both skills read it from the remote with `git ls-remote --symref origin HEAD`; handoff fetches first.
-- **promote.sh:** refuses a bridge branch that is missing commits someone else pushed; the push hint names the bridge branch's own remote (correct for forks), or `<remote>` when there is none. The takeover skill says it creates and switches to a new branch, and handoff points to it when the work is finished.
+- **Main branch:** when `origin/HEAD` is not set, both skills read it from the remote with `git ls-remote --symref origin HEAD` and use it as `origin/<name>`; handoff fetches first.
+- **promote.sh:** refuses a bridge branch that is missing commits from its upstream, whatever the local branch is called, and says to merge or rebase when both sides have new commits; if that remote cannot be fetched it warns and carries on, so a local `--base` still works offline. The push hint names the bridge branch's own remote (correct for forks), or `<remote>` when there is none. The printed undo now works after a failed `--check` and from a detached HEAD.
+- **Installer:** refuses an `AGENTS.md` with more than one bridge note instead of dropping or keeping one silently. The takeover skill says it creates and switches to a new branch, and handoff points to it when the work is finished.
 - **README:** the ground rules match the skills, pinned by a test.
 
 ## 0.1.1 · 2026-10-29

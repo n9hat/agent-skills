@@ -41,6 +41,9 @@ function parseArgs(argv) {
 
 // Replace an existing note in place, so a re-run after an upgrade brings in the current wording.
 function updateAgentsNote(file, existing, note) {
+  if (existing.split(NOTE_MARKER).length > 2) {
+    fail(`AGENTS.md has more than one '${NOTE_MARKER}'; left unchanged. Keep one bridge note and re-run.`, 1);
+  }
   const begin = existing.lastIndexOf('\n', existing.indexOf(NOTE_MARKER)) + 1;
   const endMarker = existing.indexOf(NOTE_END, begin);
   if (endMarker < 0) {

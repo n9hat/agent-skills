@@ -290,6 +290,7 @@ out="$(promote "$r" bridge/topic --check false 2>&1)"
 check "promote undo from detached HEAD: runs" sh -c "cd '$r' && ${out##*undo: }"
 check "promote undo from detached HEAD: back at the start" test "$(git -C "$r" rev-parse HEAD)" = "$start"
 check "promote undo from detached HEAD: detached again" fails git -C "$r" symbolic-ref -q HEAD
+check "promote undo from detached HEAD: branch removed" fails branch_exists "$r" feature/topic
 
 # A bridge branch started from origin/main tracks origin/main; main moving on is not missing work
 r="$(new_repo tracks-main)"
@@ -298,7 +299,14 @@ r="$(new_repo tracks-main)"
   && git push -q origin main && git reset -q --hard HEAD~1)
 check "promote branch tracking main: exits 0" promote "$r" bridge/x
 check "promote branch tracking main: work staged" grep -qx x.txt <<<"$(staged "$r")"
-check "promote undo from detached HEAD: branch removed" fails branch_exists "$r" feature/topic
+
+# Same for any other line it was started from, such as develop
+r="$(new_repo tracks-develop)"
+(cd "$r" && git push -q origin main:develop && git fetch -q \
+  && git switch -qc bridge/y origin/develop && echo y > y.txt && git add y.txt && git commit -qm y \
+  && git switch -q main && echo d > d.txt && git add d.txt && git commit -qm d \
+  && git push -q origin main:develop && git reset -q --hard HEAD~1 && git fetch -q)
+check "promote branch tracking develop: exits 0" promote "$r" bridge/y
 
 # Fork layout: base on upstream, bridge branch on origin; the push hint names origin
 r="$(new_repo fork)"

@@ -39,14 +39,25 @@ cd "$root" || die "cannot enter $root"
   || die "you have uncommitted changes; commit or stash them first"
 
 # Fetch the base's remote when it has one (origin/main); a local base (main) is used as is.
-remote="${base%%/*}"
-if [ "$remote" != "$base" ] && git remote | grep -qx "$remote"; then
+base_remote="${base%%/*}"
+if [ "$base_remote" != "$base" ] && git remote | grep -qx "$base_remote"; then
+  git fetch --quiet "$base_remote" || die "could not fetch $base_remote"
+fi
+# The new branch is pushed where the bridge branch lives (origin in a fork, not upstream).
+remote="$(git config "branch.$source_branch.remote" || echo origin)"
+if ! git remote | grep -qx "$remote"; then
+  remote="<remote>"
+elif [ "$remote" != "$base_remote" ]; then
   git fetch --quiet "$remote" || die "could not fetch $remote"
-else
-  remote="origin"
 fi
 
 git rev-parse -q --verify "$source_branch^{commit}" >/dev/null || die "no branch named $source_branch"
+# Someone else may have pushed last: promoting a local copy that lacks their commits would drop them.
+tracking="refs/remotes/$remote/$source_branch"
+if git rev-parse -q --verify "$tracking" >/dev/null \
+  && ! git merge-base --is-ancestor "$tracking" "$source_branch"; then
+  die "$source_branch is missing commits from $remote/$source_branch. Get them first: git switch $source_branch && git pull --ff-only"
+fi
 git rev-parse -q --verify "$base^{commit}" >/dev/null || die "no base named $base"
 ! git rev-parse -q --verify "refs/heads/$into" >/dev/null \
   || die "branch $into already exists; pick another name with --into"

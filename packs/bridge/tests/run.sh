@@ -58,6 +58,10 @@ rules() { awk '/^## /{p = ($0 == "## Rules")} p' "$1"; }
 check "Rules present in bridge-handoff" test -n "$(rules "$PACK/skills/bridge-handoff/SKILL.md")"
 check "Rules identical in both skills" \
   test "$(rules "$PACK/skills/bridge-handoff/SKILL.md")" = "$(rules "$PACK/skills/bridge-takeover/SKILL.md")"
+rule_lines() { grep '^- \*\*' <<<"$1"; }
+readme_rules() { awk '/^## /{p = ($0 == "## Ground rules")} p' "$PACK/README.md"; }
+check "README ground rules match the skills" \
+  test "$(rule_lines "$(readme_rules)")" = "$(rule_lines "$(rules "$PACK/skills/bridge-handoff/SKILL.md")")"
 
 # --- Installed through the hub ----------------------------------------------
 for kind in sh js; do
@@ -217,6 +221,24 @@ r="$(new_repo usage)"
 promote "$r" >/dev/null 2>&1; code=$?
 check "promote no arguments: exits 2" test "$code" = 2
 check "promote no arguments: shows usage" grep -q 'Usage: sh promote.sh' <<<"$(promote "$r" 2>&1)"
+
+# A bridge branch missing commits that someone else pushed is refused, not promoted short
+r="$(new_repo behind)"
+git -C "$r" push -q -u origin bridge/topic 2>/dev/null
+git clone -q "$r.git" "$r-other" 2>/dev/null
+(cd "$r-other" && git switch -q bridge/topic && echo more > more.txt && git add more.txt \
+  && git commit -qm more && git push -q origin bridge/topic)
+out="$(promote "$r" bridge/topic 2>&1)"; code=$?
+check "promote behind its remote: refused" test "$code" = 1
+check "promote behind its remote: says how to pull" grep -q 'git pull --ff-only' <<<"$out"
+check "promote behind its remote: no branch created" fails branch_exists "$r" feature/topic
+
+# Fork layout: base on upstream, bridge branch on origin; the push hint names origin
+r="$(new_repo fork)"
+git -C "$r" push -q -u origin bridge/topic 2>/dev/null
+git -C "$r" remote add upstream "$r.git"
+out="$(promote "$r" bridge/topic --base upstream/main 2>&1)"
+check "promote fork base: push hint names the branch's own remote" grep -q 'git push -u origin feature/topic' <<<"$out"
 
 # A local --base still prints a push to the real remote
 r="$(new_repo local-base)"

@@ -174,7 +174,7 @@ mkdir -p .grok/skills && cp -R .agents/skills/bridge-* .grok/skills/
 Clone the hub once, then install the pack from inside the project you want to equip (all options are in the [hub README](../../README.md#installation)):
 
 ```bash
-git clone --branch v0.1.1 https://github.com/n9hat/agent-skills.git ~/agent-skills
+git clone --branch v0.1.2 https://github.com/n9hat/agent-skills.git ~/agent-skills
 
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash and jq
@@ -201,7 +201,7 @@ Commit the installed files so everyone who clones the project gets the bridge. A
 ```markdown
 # Bridge Handover
 
-- Branch: <branch> · Last commit: <short sha> <subject> · Pushed: <yes | no>
+- Branch: <branch> · Last commit: <short sha> <subject>
 - Written by: <name or handle> · <date, time and timezone>
 - Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
@@ -231,7 +231,7 @@ main ──●──────────────────────
 ```
 
 1. Start once: `git switch -c bridge/<topic> origin/main`.
-2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push. The path after `--` keeps anything else that is staged out of the handover commit.
+2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push (`git push -u origin HEAD` the first time). The path after `--` keeps anything else that is staged out of the handover commit.
 3. **Next session, anywhere:** `git pull`, run `/bridge-takeover`, and carry on.
 4. Repeat for as many days as the work takes. The handover is replaced each time, so there is only ever one copy.
 
@@ -251,7 +251,7 @@ A merge request (MR) or pull request always shows everything that differs betwee
 sh .claude/skills/bridge-takeover/scripts/promote.sh bridge/<topic> --check "<your project's checks>"
 ```
 
-`--check` takes the command you normally run to check the project, for example `--check "npm test"` or `--check "bash tests/run-all.sh"`; it is optional. The script refuses to start with uncommitted changes, an unknown branch, or an existing `feature/<topic>`. It stops with an error if nothing was staged, if `.bridge/` slipped in, or if the check fails, and tells you how to undo. When everything passes, it prints the commit and push commands; it never commits, pushes, or deletes anything itself. `--into <branch>` picks another name for the new branch, and `--base <ref>` another starting point than `origin/main`. The script is also in `.agents/skills/`, so either path works.
+`--check` takes the command you normally run to check the project, for example `--check "npm test"` or `--check "bash tests/run-all.sh"`; it is optional. The script refuses to start with uncommitted changes, an unknown branch, an existing `feature/<topic>`, or a bridge branch that is missing commits someone else pushed (pull them first). It stops with an error if nothing was staged, if `.bridge/` slipped in, or if the check fails, and tells you how to undo. When everything passes, it prints the commit and push commands; it never commits, pushes, or deletes anything itself. `--into <branch>` picks another name for the new branch, and `--base <ref>` another starting point than `origin/main`. The script is also in `.agents/skills/`, so either path works.
 
 Before you use the script:
 
@@ -318,9 +318,9 @@ In a public repository, a pushed bridge branch is public, and its commits can st
 
 Both skills enforce the same three rules, whichever workflow produced the code:
 
-- **Contracts first.** Shared API specs and interface or type files win over logic on a feature branch.
-- **Never push a broken shared module.** If shared code fails, keep the fix or a stand-in (test double) inside your own area until it is resolved.
-- **Tool-neutral.** Work is judged by whether it builds and passes its tests, not by which tool or method produced it.
+- **Contracts first.** When the branch's code and a shared contract (API spec, interface or type file) disagree, change the code, not the contract, unless the user agrees: other people build against the contract.
+- **Never push a broken shared module.** Others pull shared code straight away, so a break there stops them too. If shared code fails, keep the fix or a stand-in (test double) inside your own area until it is resolved.
+- **Tool-neutral.** Judge the work by whether it builds and passes its tests, not by which tool or method produced it: the next person may use a different one.
 
 Neither skill commits, pushes, or changes code on its own; the person stays in control.
 

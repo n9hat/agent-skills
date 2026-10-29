@@ -1,6 +1,6 @@
 # Agent Skills
 
-> Installable SKILL.md skills for AI coding agents that hand work over through Git. The `bridge` pack writes a branch's working context into one committed file, `.bridge/HANDOVER.md` (`/bridge-handoff`), and reads it back on another machine or for another person (`/bridge-takeover`). Everyone keeps their own way of working. MIT licence. Current release: v0.1.1.
+> Installable SKILL.md skills for AI coding agents that hand work over through Git. The `bridge` pack writes a branch's working context into one committed file, `.bridge/HANDOVER.md` (`/bridge-handoff`), and reads it back on another machine or for another person (`/bridge-takeover`). Everyone keeps their own way of working. MIT licence. Current release: v0.1.2.
 
 ## Capabilities
 
@@ -15,7 +15,7 @@
 
 ## Data model
 
-- `.bridge/HANDOVER.md`, Markdown, about one screen: header (branch, last commit, pushed, author, date, scenario, tools) + 1 Goal and boundaries, 2 Code footprint, 3 Decisions and open questions, 4 Next steps.
+- `.bridge/HANDOVER.md`, Markdown, about one screen: header (branch, last commit, author, date, scenario, tools) + 1 Goal and boundaries, 2 Code footprint, 3 Decisions and open questions, 4 Next steps.
 - Scenario values: timezone handoff, away (sick-leave) cover, device switch, other.
 - One handover per bridge branch. Committed on its own (`bridge: handoff`); never merged to main.
 

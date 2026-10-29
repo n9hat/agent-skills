@@ -7,7 +7,7 @@ Teams rarely work the same way. These skills do not ask anyone to switch framewo
 ## Quick start
 
 ```bash
-git clone --branch v0.1.0 https://github.com/n9hat/agent-skills.git ~/agent-skills
+git clone --branch v0.1.1 https://github.com/n9hat/agent-skills.git ~/agent-skills
 cd /path/to/your/project
 node ~/agent-skills/install.js bridge
 ```
@@ -101,7 +101,7 @@ Skills ship in **packs**: small, self-contained sets of skills that belong toget
 Clone this repository once, then install the packs you want from inside the project you want to equip. You need Git 2.23 or later.
 
 ```bash
-git clone --branch v0.1.0 https://github.com/n9hat/agent-skills.git ~/agent-skills
+git clone --branch v0.1.1 https://github.com/n9hat/agent-skills.git ~/agent-skills
 
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash (and jq for some packs)
@@ -120,7 +120,7 @@ node ~/agent-skills/install.js bridge          # needs Node.js 16.7 or later
 
 The installer copies each pack's skills into `.agents/skills/` (read by Codex, Copilot, and Gemini CLI, according to their documentation) and `.claude/skills/` (read by Claude Code), then runs the pack's own installer, if it has one, for anything else the pack needs. It is safe to run again. Every pack name is checked before anything is written.
 
-`--branch v0.1.0` pins the tested release; [CHANGELOG.md](CHANGELOG.md) lists what each release contains. To upgrade later, check out the new tag, then run the installer again in each project; until you do, a project keeps the version it has:
+`--branch v0.1.1` pins the tested release; [CHANGELOG.md](CHANGELOG.md) lists what each release contains. To upgrade later, check out the new tag, then run the installer again in each project; until you do, a project keeps the version it has:
 
 ```bash
 git -C ~/agent-skills fetch --tags && git -C ~/agent-skills checkout <new tag>

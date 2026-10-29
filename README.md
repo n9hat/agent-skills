@@ -145,7 +145,7 @@ The other repository only needs the same `packs/<name>/skills/<skill>/SKILL.md` 
 
 ### How do I hand a Claude Code session over to a teammate?
 
-Work on a bridge branch (`git switch -c bridge/<topic> origin/main`). At the end of the session, run `/bridge-handoff`, commit the handover on its own, and push. Your teammate pulls the branch and runs `/bridge-takeover`. See [the back-and-forth loop](packs/bridge/README.md#the-back-and-forth-loop).
+Work on a bridge branch (`git switch --no-track -c bridge/<topic> origin/main`). At the end of the session, run `/bridge-handoff`, commit the handover on its own, and push. Your teammate pulls the branch and runs `/bridge-takeover`. See [the back-and-forth loop](packs/bridge/README.md#the-back-and-forth-loop).
 
 ### How do I continue my own work on another machine?
 

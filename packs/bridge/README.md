@@ -230,7 +230,7 @@ main ──●──────────────────────
                          other machine / person
 ```
 
-1. Start once: `git switch -c bridge/<topic> origin/main`.
+1. Start once: `git switch --no-track -c bridge/<topic> origin/main` (`--no-track` keeps the new branch from tracking main).
 2. **End of a session:** commit your work as usual, run `/bridge-handoff`, then commit the handover **on its own** (`git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`) and push (`git push -u origin HEAD` the first time). The path after `--` keeps anything else that is staged out of the handover commit.
 3. **Next session, anywhere:** `git pull`, run `/bridge-takeover`, and carry on.
 4. Repeat for as many days as the work takes. The handover is replaced each time, so there is only ever one copy.

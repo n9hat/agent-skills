@@ -21,8 +21,12 @@ Record where this branch stands, in plain language, so whoever continues it, wit
    - If shared code is broken, start "Current state" with that, so the next person does not build on it.
    - No secrets or personal data: name environment variables, never their values. Your name or handle in "Written by" is fine.
 8. **Hand it back to the user.** Show the file, repeat any broken-shared-code warning, and give the commit steps. The handover gets a commit that touches only `.bridge/`, so it can be left out when the work moves to the main branch; the path after `--` keeps anything else that is staged out of it:
-   `git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md && git push`.
-   The first time, while the branch has no upstream yet, push with `git push -u origin HEAD` instead. Until it is pushed, nobody else receives it. Commit or push yourself only if the user asks.
+   `git add .bridge/HANDOVER.md && git commit -m "bridge: handoff" -- .bridge/HANDOVER.md`, then push. Which push depends on `git rev-parse --abbrev-ref '@{u}'`:
+   - `origin/<this branch>`: `git push`.
+   - None, or the main branch (a branch started from `origin/main` tracks it): `git push -u origin HEAD`.
+   - Another bridge branch, `origin/bridge/<topic>`: `git push origin HEAD:bridge/<topic>`.
+
+   Until it is pushed, nobody else receives it. Commit or push yourself only if the user asks.
 9. **If the work is finished** rather than paused, suggest promoting it instead of handing it off: `promote.sh`, in the bridge-takeover skill's `scripts/` folder, copies the work onto a clean branch without `.bridge/`.
 
 ## Rules

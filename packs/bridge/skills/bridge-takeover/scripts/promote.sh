@@ -54,7 +54,9 @@ fi
 
 git rev-parse -q --verify "$source_branch^{commit}" >/dev/null || die "no branch named $source_branch"
 # Someone else may have pushed last: promoting a local copy that lacks their commits would drop them.
+# A branch started from origin/main tracks origin/main; main moving on is not missing work.
 upstream="$(git rev-parse --symbolic-full-name "$source_branch@{u}" 2>/dev/null)" || upstream=""
+if [ "${upstream#refs/remotes/*/}" = "${base#"$base_remote"/}" ]; then upstream=""; fi
 if [ -n "$upstream" ] && git rev-parse -q --verify "$upstream" >/dev/null \
   && ! git merge-base --is-ancestor "$upstream" "$source_branch"; then
   die "$source_branch is missing commits from ${upstream#refs/remotes/}. Get them first: git switch $source_branch && git pull --ff-only (merge or rebase instead if both sides have new commits)"

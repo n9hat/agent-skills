@@ -289,6 +289,15 @@ start="$(git -C "$r" rev-parse HEAD)"
 out="$(promote "$r" bridge/topic --check false 2>&1)"
 check "promote undo from detached HEAD: runs" sh -c "cd '$r' && ${out##*undo: }"
 check "promote undo from detached HEAD: back at the start" test "$(git -C "$r" rev-parse HEAD)" = "$start"
+check "promote undo from detached HEAD: detached again" fails git -C "$r" symbolic-ref -q HEAD
+
+# A bridge branch started from origin/main tracks origin/main; main moving on is not missing work
+r="$(new_repo tracks-main)"
+(cd "$r" && git switch -qc bridge/x origin/main && echo x > x.txt && git add x.txt && git commit -qm x \
+  && git switch -q main && echo later > later.txt && git add later.txt && git commit -qm later \
+  && git push -q origin main && git reset -q --hard HEAD~1)
+check "promote branch tracking main: exits 0" promote "$r" bridge/x
+check "promote branch tracking main: work staged" grep -qx x.txt <<<"$(staged "$r")"
 check "promote undo from detached HEAD: branch removed" fails branch_exists "$r" feature/topic
 
 # Fork layout: base on upstream, bridge branch on origin; the push hint names origin

@@ -45,6 +45,7 @@ Record where this branch stands, in plain language, so whoever continues it, wit
 - Written by: <name or handle> · <date, time and timezone>
 - Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
+- When done: when the work reaches the main branch, whoever holds this branch deletes it: `git branch -D <branch> && git push origin --delete <branch>`
 
 ## 1. Goal and boundaries
 - Objective: <what this branch is for>

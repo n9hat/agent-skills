@@ -33,7 +33,7 @@ Continue someone else's work, or your own from another machine, without losing m
 
    Express the steps in the user's own workflow (tasks, beads, a spec change); if you cannot tell which, ask.
 6. **Wait for agreement.** Do not change code until the user agrees with the plan.
-7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it so `.bridge/` never reaches the main branch: `sh <this skill's folder>/scripts/promote.sh <bridge-branch> --check "<project's checks>"`, run from anywhere in the project; add `--base <main>` when the main branch is not `origin/main`. It creates `feature/<topic>` from the main branch, switches to it, and stages the work, so ask before running it; the user commits and pushes.
+7. **Keep the cache fresh.** Before the user stops, suggest a new bridge handoff. When the work is finished, suggest promoting it so `.bridge/` never reaches the main branch: `sh <this skill's folder>/scripts/promote.sh <bridge-branch> --check "<project's checks>"`, run from anywhere in the project; add `--base <main>` when the main branch is not `origin/main`. It creates `feature/<topic>` from the main branch, switches to it, and stages the work, so ask before running it; the user commits and pushes. After the work reaches the main branch, promoted or merged from other branches, the bridge branch is the user's to delete: suggest `git branch -D bridge/<topic> && git push origin --delete bridge/<topic>` from another branch, and run it only if the user agrees.
 
 ## Rules
 

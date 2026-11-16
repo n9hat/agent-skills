@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Deleting the bridge branch:** every handover now has a "When done" line: when the work reaches the main branch, whoever holds the bridge branch deletes it, locally and on the remote. `/bridge-takeover` suggests the same commands once the work is merged, by promotion or from other branches, and runs them only if the user agrees. Pinned by two tests.
+
 ## 0.1.2 · 2026-10-29
 
 Fixes from a second review of the bridge skills. To upgrade a project: `git -C ~/agent-skills fetch --tags && git -C ~/agent-skills checkout v0.1.2`, then run the installer again in the project and commit the changed files.

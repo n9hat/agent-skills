@@ -53,6 +53,10 @@ done
 template() { sed -n '/<!-- bridge-template:start -->/,/<!-- bridge-template:end -->/p' "$1"; }
 check "HANDOVER template present in bridge-handoff" test -n "$(template "$PACK/skills/bridge-handoff/SKILL.md")"
 check "HANDOVER template kept in one place" test -z "$(template "$PACK/skills/bridge-takeover/SKILL.md")"
+check "HANDOVER template says who deletes the branch" \
+  grep -q '^- When done: .*whoever holds this branch deletes it' <<<"$(template "$PACK/skills/bridge-handoff/SKILL.md")"
+check "bridge-takeover suggests deleting the bridge branch" \
+  grep -qF 'git push origin --delete bridge/<topic>' "$PACK/skills/bridge-takeover/SKILL.md"
 
 rules() { awk '/^## /{p = ($0 == "## Rules")} p' "$1"; }
 check "Rules present in bridge-handoff" test -n "$(rules "$PACK/skills/bridge-handoff/SKILL.md")"

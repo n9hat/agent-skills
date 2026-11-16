@@ -174,7 +174,7 @@ mkdir -p .grok/skills && cp -R .agents/skills/bridge-* .grok/skills/
 Clone the hub once, then install the pack from inside the project you want to equip (all options are in the [hub README](../../README.md#installation)):
 
 ```bash
-git clone --branch v0.1.2 https://github.com/n9hat/agent-skills.git ~/agent-skills
+git clone --branch v0.1.3 https://github.com/n9hat/agent-skills.git ~/agent-skills
 
 cd /path/to/your/project
 bash ~/agent-skills/install.sh bridge          # needs bash and jq
@@ -205,6 +205,7 @@ Commit the installed files so everyone who clones the project gets the bridge. A
 - Written by: <name or handle> · <date, time and timezone>
 - Scenario: <timezone handoff | away (sick-leave) cover | device switch | other>
 - Tools used: <for example "Claude Code + a task-graph workflow", "Codex + specs", "none">
+- When done: when the work reaches the main branch, whoever holds this branch deletes it: `git branch -D <branch> && git push origin --delete <branch>`
 
 ## 1. Goal and boundaries
 ## 2. Code footprint

@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.3 · 2026-11-16
 
-- **Deleting the bridge branch:** every handover now has a "When done" line: when the work reaches the main branch, whoever holds the bridge branch deletes it, locally and on the remote. `/bridge-takeover` suggests the same commands once the work is merged, by promotion or from other branches, and runs them only if the user agrees. Pinned by two tests.
+Says who deletes the bridge branch. To upgrade a project: `git -C ~/agent-skills fetch --tags && git -C ~/agent-skills checkout v0.1.3`, then run the installer again in the project and commit the changed files.
+
+- **Deleting the bridge branch:** every handover now has a "When done" line: when the work reaches the main branch, whoever holds the bridge branch deletes it, locally and on the remote. The line travels in `HANDOVER.md`, so a reader without the skills still sees it. `/bridge-takeover` suggests the same commands once the work is merged, by promotion or from other branches, and runs them only if the user agrees. The README's copy of the template matches. Pinned by two tests.
 
 ## 0.1.2 · 2026-10-29
 

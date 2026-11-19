@@ -4,6 +4,8 @@
 
 Teams rarely work the same way. These skills do not ask anyone to switch framework or tooling: **everyone keeps their own way of working**, and the work still moves between them. Each skill uses the open `SKILL.md` format.
 
+▶️ **[Watch the walkthrough on YouTube](https://youtu.be/qEK0dxQwN-U)** (or click the image)
+
 [![Watch the walkthrough on YouTube](https://img.youtube.com/vi/qEK0dxQwN-U/hqdefault.jpg)](https://youtu.be/qEK0dxQwN-U)
 
 ## Quick start

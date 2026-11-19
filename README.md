@@ -6,7 +6,7 @@ Teams rarely work the same way. These skills do not ask anyone to switch framewo
 
 ▶️ **[Watch the walkthrough on YouTube](https://youtu.be/qEK0dxQwN-U)** (or click the image)
 
-[![Watch the walkthrough on YouTube](https://img.youtube.com/vi/qEK0dxQwN-U/hqdefault.jpg)](https://youtu.be/qEK0dxQwN-U)
+<a href="https://youtu.be/qEK0dxQwN-U"><img src="docs/bridge-flow.svg" width="720" alt="How the bridge hands work over through Git: Machine A runs /bridge-handoff, which writes HANDOVER.md; Git carries it on a bridge branch; /bridge-takeover checks it against the repo; Machine B carries on in its own workflow"></a>
 
 ## Quick start
 
@@ -190,6 +190,8 @@ packs/
       bridge-handoff/SKILL.md
       bridge-takeover/SKILL.md, scripts/promote.sh
     tests/run.sh                 # tests for this pack
+docs/
+  bridge-flow.svg                # the animated diagram at the top of this README
 tests/
   installer.sh                   # tests for the hub installers
   run-all.sh                     # runs every test above
